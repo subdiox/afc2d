@@ -19,5 +19,4 @@ All you need is `afc2d_patched.deb`, so you can remove `afc2d`.
 Transport created deb file to your iDevice, and run the following commands in iTerm2 or via SSH:
 ```
 dpkg -i afc2d_patched.deb
-killall -9 lockdownd
 ```

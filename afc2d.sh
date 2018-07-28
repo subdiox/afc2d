@@ -9,6 +9,16 @@ if [[ `uname` != Darwin ]]; then
 	exit
 fi
 
+if ! type cmake > /dev/null 2>&1; then
+  echo "[Error] Command \"cmake\" not found. Run \"brew install cmake\" to install it."
+	exit
+fi
+
+if [[ ! -e $OPENSSL_ROOT_DIR || ! -e $OPENSSL_LIBRARIES ]]; then
+  echo "[Error] Command \"openssl\" not found. Run \"brew install openssl\" to install it."
+	exit
+fi
+
 if [[ ! -d afc2d ]]; then
 	rm -f afc2d
 	mkdir afc2d
@@ -75,12 +85,15 @@ chmod +x usr/libexec/afc2d
 chmod +x postrm
 ldid -Sent.plist usr/libexec/afc2d
 ldid -Sent.plist postrm
-rm extrainst_
+cat << EOS > extrainst_
+killall -9 lockdownd || true
+EOS
+chmod +x extrainst_
 
 echo "6. creating patched afc2d deb package ..."
 rm data.tar.gz
 tar zcf data.tar.gz Library usr
 rm control.tar.gz
-tar zcf control.tar.gz control postrm
+tar zcf control.tar.gz control postrm extrainst_
 rm -f ../afc2d_patched.deb
 ar rc ../afc2d_patched.deb debian-binary control.tar.gz data.tar.gz
